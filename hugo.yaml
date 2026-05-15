@@ -1,0 +1,38 @@
+baseURL: https://wjrizh.github.io/
+locale: zh-cn
+title: "Embedded Notebook"
+theme: PaperMod
+
+params:
+  description: "嵌入式系统与Linux内核学习笔记"
+  author: wjrizh
+  defaultTheme: dark
+  ShowReadingTime: true
+  ShowWordCount: true
+  ShowCodeCopyButtons: true
+  homeInfoParams:
+    Title: "嵌入式学习笔记"
+    Content: "记录 Linux 内核、驱动开发、嵌入式系统的学习过程。\n\nZero 2W + 树莓派，从裸板开始。"
+  socialIcons:
+    - name: github
+      url: "https://github.com/wjrizh"
+
+menu:
+  main:
+    - name: 首页
+      url: /
+      weight: 10
+    - name: 分类
+      url: /categories/
+      weight: 20
+    - name: 标签
+      url: /tags/
+      weight: 30
+    - name: 关于
+      url: /about/
+      weight: 40
+
+markup:
+  highlight:
+    style: dracula
+    noClasses: false
