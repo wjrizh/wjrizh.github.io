@@ -1,4 +1,4 @@
-{{- /* 右下角背景音乐播放器：跨页面续播 + 自动尝试播放 */ -}}
+{{- /* 右下角背景音乐播放器 + swup 无刷新导航（保证切换页面音乐不中断） */ -}}
 <div id="bgm-player" title="The Dark Side of the Moon">
   <button id="bgm-toggle" aria-label="播放/暂停音乐">♪</button>
   <span class="bgm-title"><span class="note">♪</span>Rocket Man</span>
@@ -16,11 +16,8 @@
   function markPlaying() { player.classList.add('playing'); btn.textContent = '❚❚'; }
   function markPaused() { player.classList.remove('playing'); btn.textContent = '♪'; }
 
-  // wantPlay 表示"用户意图是否在播放"，与 audio.paused 解耦，
-  // 避免页面卸载时浏览器触发的 pause 事件把状态误写为 false。
   var saved = {};
   try { saved = JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch (e) {}
-  // 默认自动播放（用户未主动暂停过）；用户主动暂停后 saved.playing=false。
   var wantPlay = saved.playing === undefined ? true : saved.playing === true;
   if (typeof saved.t === 'number' && saved.t > 0) {
     audio.currentTime = saved.t;
@@ -28,19 +25,14 @@
 
   function save() {
     try {
-      sessionStorage.setItem(KEY, JSON.stringify({
-        t: audio.currentTime,
-        playing: wantPlay
-      }));
+      sessionStorage.setItem(KEY, JSON.stringify({ t: audio.currentTime, playing: wantPlay }));
     } catch (e) {}
   }
 
   function tryPlay() {
     var p = audio.play();
     if (p && p.then) {
-      p.then(markPlaying).catch(function () {
-        bindGesture();
-      });
+      p.then(markPlaying).catch(function () { bindGesture(); });
     }
   }
 
@@ -75,17 +67,31 @@
   });
 
   audio.addEventListener('timeupdate', save);
-
-  // 页面卸载前落盘当前进度与意图
   window.addEventListener('pagehide', save);
-  window.addEventListener('beforeunload', save);
 
-  // 进入页面：续播或自动尝试播放
-  if (wantPlay) {
-    tryPlay();
+  if (wantPlay) tryPlay(); else markPaused();
+})();
+
+// 初始化 swup：容器限定为 main，播放器在 main 之外，切换时不被销毁。
+(function () {
+  function initSwup() {
+    if (typeof Swup === 'undefined') return;
+    var swup = new Swup({ containers: ['main'] });
+    swup.hooks.on('page:view', function () {
+      // 重新高亮当前菜单（PaperMod 的菜单在 header，不随 main 替换）
+      var path = location.pathname.replace(/\/$/, '') || '/';
+      document.querySelectorAll('#menu a').forEach(function (a) {
+        var href = a.getAttribute('href') || '';
+        var norm = href.replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '') || '/';
+        if (norm === path) a.classList.add('active');
+        else a.classList.remove('active');
+      });
+    });
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    initSwup();
   } else {
-    // 用户从未播放过或主动暂停过：不自动播放
-    markPaused();
+    document.addEventListener('DOMContentLoaded', initSwup);
   }
 })();
 </script>
