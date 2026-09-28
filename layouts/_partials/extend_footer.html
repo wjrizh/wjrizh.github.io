@@ -1,4 +1,4 @@
-{{- /* 右下角背景音乐播放器：自动尝试播放，被浏览器拦截则等首次交互 */ -}}
+{{- /* 右下角背景音乐播放器：跨页面续播 + 自动尝试播放 */ -}}
 <div id="bgm-player" title="The Dark Side of the Moon">
   <button id="bgm-toggle" aria-label="播放/暂停音乐">♪</button>
   <span class="bgm-title"><span class="note">♪</span>Rocket Man</span>
@@ -11,16 +11,35 @@
   var audio = document.getElementById('bgm-audio');
   if (!player || !btn || !audio) return;
 
+  var KEY = 'bgm-state';
+
   function markPlaying() { player.classList.add('playing'); btn.textContent = '❚❚'; }
   function markPaused() { player.classList.remove('playing'); btn.textContent = '♪'; }
 
-  var userPaused = false;
+  function save() {
+    try {
+      sessionStorage.setItem(KEY, JSON.stringify({
+        t: audio.currentTime,
+        playing: !audio.paused && !audio.ended
+      }));
+    } catch (e) {}
+  }
+  function load() {
+    try { return JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch (e) { return {}; }
+  }
+
+  // 跨页面恢复播放进度
+  var saved = load();
+  var wantPlay = saved.playing;
+  if (typeof saved.t === 'number' && saved.t > 0) {
+    audio.currentTime = saved.t;
+  }
 
   function tryPlay() {
-    if (userPaused) return;
     var p = audio.play();
     if (p && p.then) {
       p.then(markPlaying).catch(function () {
+        // 被自动播放策略拦截：等首次交互再试
         bindGesture();
       });
     }
@@ -35,6 +54,7 @@
       document.removeEventListener('keydown', once, true);
       document.removeEventListener('touchstart', once, true);
       document.removeEventListener('scroll', once, true);
+      if (!wantPlay) { markPaused(); return; }
       tryPlay();
     };
     document.addEventListener('click', once, true);
@@ -45,17 +65,22 @@
 
   btn.addEventListener('click', function () {
     if (audio.paused) {
-      userPaused = false;
+      wantPlay = true;
       audio.play().then(markPlaying).catch(function () {});
     } else {
-      userPaused = true;
+      wantPlay = false;
       audio.pause();
       markPaused();
     }
+    save();
   });
 
-  audio.addEventListener('ended', markPaused);
+  audio.addEventListener('timeupdate', save);
+  audio.addEventListener('pause', save);
+  audio.addEventListener('play', save);
+  audio.addEventListener('ended', function () { markPaused(); save(); });
 
+  // 进入页面：尝试续播/自动播放
   tryPlay();
 })();
 </script>
