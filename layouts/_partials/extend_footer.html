@@ -1,8 +1,8 @@
-{{- /* 右下角背景音乐播放器，默认不自动播放 */ -}}
+{{- /* 右下角背景音乐播放器：自动尝试播放，被浏览器拦截则等首次交互 */ -}}
 <div id="bgm-player" title="The Dark Side of the Moon">
   <button id="bgm-toggle" aria-label="播放/暂停音乐">♪</button>
   <span class="bgm-title"><span class="note">♪</span>Rocket Man</span>
-  <audio id="bgm-audio" loop preload="none" src="{{ "music/rocket-man.mp3" | relURL }}"></audio>
+  <audio id="bgm-audio" loop preload="auto" src="{{ "music/rocket-man.mp3" | relURL }}"></audio>
 </div>
 <script>
 (function () {
@@ -10,21 +10,52 @@
   var btn = document.getElementById('bgm-toggle');
   var audio = document.getElementById('bgm-audio');
   if (!player || !btn || !audio) return;
+
+  function markPlaying() { player.classList.add('playing'); btn.textContent = '❚❚'; }
+  function markPaused() { player.classList.remove('playing'); btn.textContent = '♪'; }
+
+  var userPaused = false;
+
+  function tryPlay() {
+    if (userPaused) return;
+    var p = audio.play();
+    if (p && p.then) {
+      p.then(markPlaying).catch(function () {
+        bindGesture();
+      });
+    }
+  }
+
+  var gestureBound = false;
+  function bindGesture() {
+    if (gestureBound) return;
+    gestureBound = true;
+    var once = function () {
+      document.removeEventListener('click', once, true);
+      document.removeEventListener('keydown', once, true);
+      document.removeEventListener('touchstart', once, true);
+      document.removeEventListener('scroll', once, true);
+      tryPlay();
+    };
+    document.addEventListener('click', once, true);
+    document.addEventListener('keydown', once, true);
+    document.addEventListener('touchstart', once, true);
+    document.addEventListener('scroll', once, true);
+  }
+
   btn.addEventListener('click', function () {
     if (audio.paused) {
-      audio.play().then(function () {
-        player.classList.add('playing');
-        btn.textContent = '❚❚';
-      }).catch(function () {});
+      userPaused = false;
+      audio.play().then(markPlaying).catch(function () {});
     } else {
+      userPaused = true;
       audio.pause();
-      player.classList.remove('playing');
-      btn.textContent = '♪';
+      markPaused();
     }
   });
-  audio.addEventListener('ended', function () {
-    player.classList.remove('playing');
-    btn.textContent = '♪';
-  });
+
+  audio.addEventListener('ended', markPaused);
+
+  tryPlay();
 })();
 </script>
