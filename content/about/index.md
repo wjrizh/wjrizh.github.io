@@ -4,10 +4,12 @@ date: 2026-05-15
 layout: "about"
 ---
 
-## 关于这个博客
+## 关于
 
-记录嵌入式 Linux 系统、内核与驱动开发的学习过程。
+> The Dark Side of the Moon.
 
-从树莓派 Zero 2W 裸板开始，逐步深入。
+你好，我是 **wjrizh**。
 
-GitHub: [github.com/wjrizh](https://github.com/wjrizh)
+这里是我的个人主页，偶尔写点代码，听点音乐。
+
+- GitHub: [github.com/wjrizh](https://github.com/wjrizh)
