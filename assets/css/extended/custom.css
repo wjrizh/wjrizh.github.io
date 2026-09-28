@@ -1,0 +1,174 @@
+/* ===== WJRIZH 自定义主题：暗色霓虹 · 二次元 ===== */
+
+:root {
+  --neon-pink: #ff5fa2;
+  --neon-cyan: #4be1ff;
+  --neon-purple: #b06cff;
+  --neon-glow: 0 0 12px rgba(255, 95, 162, .55), 0 0 28px rgba(75, 225, 255, .35);
+}
+
+/* 全局深色渐变背景 */
+body.dark {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(176, 108, 255, .16), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(75, 225, 255, .12), transparent 55%),
+    radial-gradient(800px 500px at 50% 120%, rgba(255, 95, 162, .10), transparent 60%),
+    #0b0d12;
+  background-attachment: fixed;
+}
+
+/* 顶部导航霓虹描边 */
+.nav {
+  backdrop-filter: blur(10px);
+  background: rgba(11, 13, 18, .72);
+  border-bottom: 1px solid rgba(255, 95, 162, .18);
+}
+.logo a {
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-pink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+/* 头像：圆形 + 霓虹环 + 缓慢旋转光晕 */
+.profile_inner img {
+  border-radius: 50%;
+  border: 2px solid rgba(255, 95, 162, .7);
+  box-shadow: var(--neon-glow);
+  transition: transform .5s cubic-bezier(.32,.72,0,1), box-shadow .5s;
+  animation: avatarFloat 6s ease-in-out infinite;
+}
+.profile_inner img:hover {
+  transform: scale(1.06) rotate(-2deg);
+  box-shadow: 0 0 20px rgba(255, 95, 162, .85), 0 0 50px rgba(75, 225, 255, .55);
+}
+@keyframes avatarFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* 首页大标题：霓虹渐变 + 打字光标感 */
+.profile .profile_inner h1 {
+  background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+  letter-spacing: .06em;
+  animation: hueShift 8s linear infinite;
+}
+@keyframes hueShift {
+  to { background-position: 200% center; }
+}
+.profile .profile_inner span {
+  color: var(--neon-cyan);
+  opacity: .85;
+  letter-spacing: .08em;
+}
+
+/* 首页按钮：霓虹边框 */
+.profile .buttons .button {
+  border: 1px solid rgba(75, 225, 255, .5);
+  border-radius: 999px;
+  transition: all .25s;
+}
+.profile .buttons .button:hover {
+  border-color: var(--neon-pink);
+  box-shadow: var(--neon-glow);
+  transform: translateY(-2px);
+}
+
+/* 文章卡片：hover 发光抬升 */
+.post-entry {
+  border: 1px solid rgba(176, 108, 255, .16);
+  border-radius: 14px;
+  transition: transform .25s, box-shadow .25s, border-color .25s;
+}
+.post-entry:hover {
+  transform: translateY(-4px);
+  border-color: rgba(255, 95, 162, .55);
+  box-shadow: 0 8px 30px rgba(176, 108, 255, .22);
+}
+
+/* 链接霓虹下划线 */
+.post-content a, .entry-content a {
+  color: var(--neon-cyan);
+  text-decoration: none;
+  border-bottom: 1px dashed rgba(75, 225, 255, .5);
+}
+.post-content a:hover, .entry-content a:hover {
+  color: var(--neon-pink);
+  border-bottom-color: var(--neon-pink);
+}
+
+/* 代码块霓虹边框 */
+.post-content pre {
+  border: 1px solid rgba(75, 225, 255, .18);
+  border-radius: 10px;
+  box-shadow: inset 0 0 24px rgba(75, 225, 255, .04);
+}
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: #0b0d12; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(var(--neon-purple), var(--neon-pink));
+  border-radius: 999px;
+}
+
+/* ===== 右下角音乐播放器 ===== */
+#bgm-player {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(17, 20, 28, .82);
+  border: 1px solid rgba(255, 95, 162, .45);
+  box-shadow: var(--neon-glow);
+  backdrop-filter: blur(10px);
+  color: #e8ecf4;
+  font-size: 13px;
+  user-select: none;
+}
+#bgm-player button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+  color: #fff;
+  font-size: 15px;
+  display: grid;
+  place-items: center;
+  transition: transform .2s, filter .2s;
+}
+#bgm-player button:hover { transform: scale(1.1); filter: brightness(1.15); }
+#bgm-player .bgm-title {
+  max-width: 180px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: .9;
+}
+#bgm-player .bgm-title .note {
+  color: var(--neon-cyan);
+  margin-right: 6px;
+}
+/* 旋转唱片图标（播放时转动） */
+#bgm-player.playing .bgm-disc {
+  animation: spin 3s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+  #bgm-player .bgm-title { max-width: 100px; }
+}

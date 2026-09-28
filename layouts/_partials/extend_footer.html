@@ -1,0 +1,30 @@
+{{- /* 右下角背景音乐播放器，默认不自动播放 */ -}}
+<div id="bgm-player" title="The Dark Side of the Moon">
+  <button id="bgm-toggle" aria-label="播放/暂停音乐">♪</button>
+  <span class="bgm-title"><span class="note">♪</span>Rocket Man</span>
+  <audio id="bgm-audio" loop preload="none" src="{{ "music/rocket-man.mp3" | relURL }}"></audio>
+</div>
+<script>
+(function () {
+  var player = document.getElementById('bgm-player');
+  var btn = document.getElementById('bgm-toggle');
+  var audio = document.getElementById('bgm-audio');
+  if (!player || !btn || !audio) return;
+  btn.addEventListener('click', function () {
+    if (audio.paused) {
+      audio.play().then(function () {
+        player.classList.add('playing');
+        btn.textContent = '❚❚';
+      }).catch(function () {});
+    } else {
+      audio.pause();
+      player.classList.remove('playing');
+      btn.textContent = '♪';
+    }
+  });
+  audio.addEventListener('ended', function () {
+    player.classList.remove('playing');
+    btn.textContent = '♪';
+  });
+})();
+</script>

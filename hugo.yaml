@@ -1,18 +1,31 @@
 baseURL: https://wjrizh.github.io/
 locale: zh-cn
-title: "Embedded Notebook"
+title: "WJRIZH"
 theme: PaperMod
 
 params:
-  description: "嵌入式系统与Linux内核学习笔记"
+  description: "The Dark Side of the Moon"
   author: wjrizh
   defaultTheme: dark
   ShowReadingTime: true
   ShowWordCount: true
   ShowCodeCopyButtons: true
-  homeInfoParams:
-    Title: "嵌入式学习笔记"
-    Content: "记录 Linux 内核、驱动开发、嵌入式系统的学习过程。\n\nZero 2W + 树莓派，从裸板开始。"
+  ShowShareButtons: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  profileMode:
+    enabled: true
+    title: "LGCODE"
+    subtitle: "The Dark Side of the Moon"
+    imageUrl: "/avatar.jpg"
+    imageWidth: 160
+    imageHeight: 160
+    imageTitle: "wjrizh"
+    buttons:
+      - name: 文章
+        url: /posts/
+      - name: 关于
+        url: /about/
   socialIcons:
     - name: github
       url: "https://github.com/wjrizh"
@@ -22,15 +35,18 @@ menu:
     - name: 首页
       url: /
       weight: 10
+    - name: 文章
+      url: /posts/
+      weight: 20
     - name: 分类
       url: /categories/
-      weight: 20
+      weight: 30
     - name: 标签
       url: /tags/
-      weight: 30
+      weight: 40
     - name: 关于
       url: /about/
-      weight: 40
+      weight: 50
 
 markup:
   highlight:
