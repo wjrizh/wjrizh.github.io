@@ -16,30 +16,29 @@
   function markPlaying() { player.classList.add('playing'); btn.textContent = '❚❚'; }
   function markPaused() { player.classList.remove('playing'); btn.textContent = '♪'; }
 
+  // wantPlay 表示"用户意图是否在播放"，与 audio.paused 解耦，
+  // 避免页面卸载时浏览器触发的 pause 事件把状态误写为 false。
+  var saved = {};
+  try { saved = JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch (e) {}
+  // 默认自动播放（用户未主动暂停过）；用户主动暂停后 saved.playing=false。
+  var wantPlay = saved.playing === undefined ? true : saved.playing === true;
+  if (typeof saved.t === 'number' && saved.t > 0) {
+    audio.currentTime = saved.t;
+  }
+
   function save() {
     try {
       sessionStorage.setItem(KEY, JSON.stringify({
         t: audio.currentTime,
-        playing: !audio.paused && !audio.ended
+        playing: wantPlay
       }));
     } catch (e) {}
-  }
-  function load() {
-    try { return JSON.parse(sessionStorage.getItem(KEY) || '{}'); } catch (e) { return {}; }
-  }
-
-  // 跨页面恢复播放进度
-  var saved = load();
-  var wantPlay = saved.playing;
-  if (typeof saved.t === 'number' && saved.t > 0) {
-    audio.currentTime = saved.t;
   }
 
   function tryPlay() {
     var p = audio.play();
     if (p && p.then) {
       p.then(markPlaying).catch(function () {
-        // 被自动播放策略拦截：等首次交互再试
         bindGesture();
       });
     }
@@ -76,11 +75,17 @@
   });
 
   audio.addEventListener('timeupdate', save);
-  audio.addEventListener('pause', save);
-  audio.addEventListener('play', save);
-  audio.addEventListener('ended', function () { markPaused(); save(); });
 
-  // 进入页面：尝试续播/自动播放
-  tryPlay();
+  // 页面卸载前落盘当前进度与意图
+  window.addEventListener('pagehide', save);
+  window.addEventListener('beforeunload', save);
+
+  // 进入页面：续播或自动尝试播放
+  if (wantPlay) {
+    tryPlay();
+  } else {
+    // 用户从未播放过或主动暂停过：不自动播放
+    markPaused();
+  }
 })();
 </script>
